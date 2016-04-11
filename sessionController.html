@@ -1,0 +1,64 @@
+3<html>
+<head>
+	<title>Session Controller Plugin JS</title>
+	<script src="https://code.jquery.com/jquery-1.12.3.js"></script>
+</head>
+<body>
+	<h1>Session Controller PLUGIN JS</h1>
+	<script>
+	fdsa
+(function() {
+	// Define our constructor
+	SessionController = function() {
+		var self = this;
+		
+		self.counter = 0;
+
+		self.timer = function(){
+			console.log(self.counter);
+			self.counter++;
+			if(self.counter > 5) alert("Session is over");
+		}
+
+		var defaults = {
+			gotoUrl : "www.jazpana.com",
+			alertText : "You have lost the session."
+		}
+		
+		if(arguments[0] && typeof arguments[0] === "object"){
+			this.options = extendDefaults(defaults, arguments[0]);
+		} else this.options = defaults;
+
+	}
+
+	//Public methods
+	SessionController.prototype.init = function(){
+		console.log("SessionController has been launcheds");
+		var self = this;
+		var idInterval = setInterval(self.timer, 1000);
+
+		$(window).mousemove(function (e) {
+			self.counter = 0;
+		});
+		$(window).keypress(function (e) {
+			self.counter = 0;
+		});
+	}
+
+	//Private methods
+	var extendDefaults = function(source, properties) {
+		var property;
+		for (property in properties) {
+			if (properties.hasOwnProperty(property)) {
+				source[property] = properties[property];
+			}
+		}
+		return source;
+	}		
+}());
+
+
+	</script>
+	
+</body>
+</html>
