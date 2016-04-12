@@ -1,40 +1,64 @@
-3<html>
+<html>
 <head>
 	<title>Session Controller Plugin JS</title>
 	<script src="https://code.jquery.com/jquery-1.12.3.js"></script>
 </head>
 <body>
 	<h1>Session Controller PLUGIN JS</h1>
+	<p>TIME COUNTER: <span id="counter">0</span></p>
+	<br>
+	<p>TODO:</p>
+	<ul>
+		<li>Extend default options</li>
+	</ul>
 	<script>
 (function() {
-	// Constructor
+
+	/****************************
+	CONSTRUCTOR
+	****************************/
 	SessionController = function() {
 		var self = this;
-		
+		self.instances.push(this);
+		self.idInterval = null;
 		self.counter = 0;
+		self.options = null;
 
-		self.timer = function(){
-			console.log(self.counter);
+		self.controller = function(){
+			$('#counter').html(self.counter);
 			self.counter++;
-			if(self.counter > 5) alert("Session is over");
+			if(self.counter > 10){
+				alert(self.options.alertText);
+				self.stop();
+			}
 		}
 
 		var defaults = {
 			gotoUrl : "login.jsp",
-			alertText : "You have lost the session."
+			alertText : "You have lost the session.",
+			time : 1000
 		}
 		
 		if(arguments[0] && typeof arguments[0] === "object"){
-			this.options = extendDefaults(defaults, arguments[0]);
-		} else this.options = defaults;
+			self.options = extendDefaults(defaults, arguments[0]);
+		} else self.options = defaults;
 
 	}
+	
+	/****************************
+	PUBLIC METHODS
+	****************************/
 
-	//Public methods
+	//Global array to storage all instances created.
+	SessionController.prototype.instances = [];
+
 	SessionController.prototype.init = function(){
-		console.log("SessionController has been launcheds");
+		console.log("SessionController has been launched");
 		var self = this;
-		var idInterval = setInterval(self.timer, 1000);
+		for(var x=0; x<self.instances.length; x++){
+			self.instances[x].stop();
+		}
+		self.idInterval = setInterval(this.controller, self.options.time);
 
 		$(window).mousemove(function (e) {
 			self.counter = 0;
@@ -44,7 +68,18 @@
 		});
 	}
 
-	//Private methods
+	SessionController.prototype.stop = function(){
+		clearInterval(this.idInterval);
+		$('#customCounter').append('<span>The counter has been stopped</span>');
+	}
+
+	/****************************
+	PRIVATE METHODS
+	****************************/
+	var stopInstances = function(){
+
+	};
+
 	var extendDefaults = function(source, properties) {
 		var property;
 		for (property in properties) {
@@ -53,7 +88,12 @@
 			}
 		}
 		return source;
-	}		
+	};
+
+
+	//initialize and init a default SessionController
+	var SCInstance = new SessionController();		
+	SCInstance.init();
 }());
 
 
