@@ -9,7 +9,6 @@
 	<br>
 	<p>TODO:</p>
 	<ul>
-		<li>Extend default options</li>
 	</ul>
 	<script>
 (function() {
@@ -17,79 +16,64 @@
 	/****************************
 	CONSTRUCTOR
 	****************************/
-	SessionController = function() {
+	SessionController = function(options) {
 		var self = this;
+
 		self.instances.push(this);
 		self.idInterval = null;
 		self.counter = 0;
-		self.options = null;
+
+		var defaults = {
+			time : 5,
+			gotoUrl : "login.jsp",
+			alertText : "You have lost the session.",
+			callback: function(){
+				alert(self.options.alertText);
+			}
+		}
+		self.options = $.extend( {}, defaults, options);
 
 		self.controller = function(){
 			$('#counter').html(self.counter);
 			self.counter++;
-			if(self.counter > 10){
-				alert(self.options.alertText);
+			if(self.counter > self.options.time){
+				self.options.callback();
 				self.stop();
 			}
 		}
-
-		var defaults = {
-			gotoUrl : "login.jsp",
-			alertText : "You have lost the session.",
-			time : 1000
-		}
-		
-		if(arguments[0] && typeof arguments[0] === "object"){
-			self.options = extendDefaults(defaults, arguments[0]);
-		} else self.options = defaults;
-
 	}
 	
 	/****************************
 	PUBLIC METHODS
 	****************************/
-
+	
 	//Global array to storage all instances created.
 	SessionController.prototype.instances = [];
 
 	SessionController.prototype.init = function(){
 		console.log("SessionController has been launched");
 		var self = this;
-		for(var x=0; x<self.instances.length; x++){
-			self.instances[x].stop();
-		}
-		self.idInterval = setInterval(this.controller, self.options.time);
+		
+		stopInstances(self);
+		self.idInterval = setInterval(this.controller, 1000);
 
-		$(window).mousemove(function (e) {
-			self.counter = 0;
-		});
-		$(window).keypress(function (e) {
-			self.counter = 0;
-		});
+		$(window).mousemove(function (e) { self.counter = 0;});
+		$(window).keypress(function (e) { self.counter = 0;});
 	}
 
 	SessionController.prototype.stop = function(){
 		clearInterval(this.idInterval);
-		$('#counter').append('<span>The counter has been stopped</span>');
 	}
 
 	/****************************
 	PRIVATE METHODS
 	****************************/
-	var stopInstances = function(){
-
-	};
-
-	var extendDefaults = function(source, properties) {
-		var property;
-		for (property in properties) {
-			if (properties.hasOwnProperty(property)) {
-				source[property] = properties[property];
-			}
+	var stopInstances = function(self){
+		for(var x=0; x<self.instances.length; x++){
+			self.instances[x].stop();
+			console.log('Instance: ' + self.instances[x] + ' stopped');
 		}
-		return source;
 	};
-
 
 	//initialize and init a default SessionController
 	var SCInstance = new SessionController();		
