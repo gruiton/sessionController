@@ -11,7 +11,7 @@
 		self.lastActivity = null;
 
 		var defaults = {
-			timeout : 30,
+			timeout : 20,
 			gotoUrl : "login.jsp",
 			alertText : "You have lost the session.",
 			callback: function(){
